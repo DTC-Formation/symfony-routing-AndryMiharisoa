@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomepageController!{% endblock %}
+  {% set age=20 %}
+{% block body %}
+<head>
+  <title>Calculateur</title>
+  <script>
+    function afficherResultat() {
+      var nombre1 = parseFloat(document.getElementById('nombre1').value);
+      var operateur = document.getElementById('operateur').value;
+      var nombre2 = parseFloat(document.getElementById('nombre2').value);
+
+      var resultatElement = document.getElementById('resultat');
+      var resultat;
+
+      // Effectuer le calcul en fonction de l'opérateur
+      if (operateur === '+') {
+          resultat = nombre1 + nombre2;
+      } else if (operateur === '-') {
+          resultat = nombre1 - nombre2;
+      } else if (operateur === '*') {
+          resultat = nombre1 * nombre2;
+      } else {
+          resultat = null;
+      }
+
+      // Afficher le résultat
+      resultatElement.innerText = "Résultat : " + resultat;
+    }
+  </script>
+</head>
+<body>
+  <form>
+    <input type="number" id="nombre1" placeholder="Entrez un nombre">
+    <input type="text" id="operateur" placeholder="Entrez un opérateur (+, -, *)">
+    <input type="number" id="nombre2" placeholder="Entrez un autre nombre">
+    <input type="button" value="Calculer" onclick="afficherResultat()">
+  </form>
+
+  <div id="resultat"></div>
+ 
+{% endblock %}
+ 

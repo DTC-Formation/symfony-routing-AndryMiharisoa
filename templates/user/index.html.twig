@@ -4,6 +4,48 @@
 
 {% block body %}
     <h1>User index</h1>
+      <button type="button" id="modal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">
+    Ajouter
+  </button>
+     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Personne</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="firstName" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="Nom" placeholder="Entrer votre nom">
+            </div>
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="prenom" placeholder="Entre votre prénom">
+            </div>
+            <div class="mb-3">
+              <label for="age" class="form-label">Age</label>
+              <input type="number" class="form-control" id="age" placeholder="Entre votre age">
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" placeholder="Entre votre adress">
+            </div>
+            <div class="mb-3">
+              <label for="cin" class="form-label">CIN (Identification Number)</label>
+              <input type="text" class="form-control" id="cin" placeholder="Entre votre cin">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermé</button>
+          <button type="submit" class="btn btn-primary"id="addPersonButton">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <a href="{{ path('app_user_new') }}" style="margin-left:800px;" class="btn btn-success s-50">Ajouter</a>
     <table class="table" id="example">
         <thead>
@@ -12,7 +54,7 @@
                 <th>Nom</th>
                 <th>Prenom</th>
                 <th>Age</th>
-                <th>CIN</th>
+                <th>Cin</th>
                 <th>Adress</th>
                 <th>actions</th>
             </tr>
@@ -28,7 +70,7 @@
                <td>{{ user.Adresse }}</td>
                 <td>
                     <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-info"><i class="fa fa-eye" style="padding: 5px"></i></a>
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-success"><i class="fa fa-edit" style="padding: 5px"></i></a>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-danger"><i class="fa fa-edit" style="padding: 5px"></i></a>
                 </td>
             </tr>
         {% else %}
@@ -45,15 +87,50 @@
        {{parent()}}
         <script>
             $(function() {
-                
+
                 $('#example').DataTable({
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
                     }
                   });
-
-
+                  
+                  
                 });
+               $(document).ready(function() {
+        // Ouvrir le popup modal lors du clic sur le bouton "Ajouter"
+        $('#addPersonModal').on('shown.bs.modal', function() {
+            // Effectuer une requête Ajax pour récupérer le contenu du formulaire d'ajout de personne
+            $.ajax({
+                url: "{{ path('person_add') }}",
+                type: "GET",
+                success: function(response) {
+                    $('.modal-body').html(response);
+                }
+            });
+        });
+
+        // Envoyer la requête Ajax pour ajouter une personne lors du clic sur le bouton "Ajouter" dans le popup modal
+        $('#addPersonButton').click(function() {
+            var formData = $('.modal-body form').serialize();
+            $.ajax({
+                url: "{{ path('person_add') }}",
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    // Mettre à jour le tableau des personnes avec la nouvelle personne ajoutée
+                    $.ajax({
+                        url: "{{ path('person_list') }}",
+                        type: "GET",
+                        success: function(response) {
+                            $('table').html(response);
+                            $('#addPersonModal').modal('hide');
+                        }
+                    });
+                }
+            });
+        });
+    });
+                
 
     </script>
    {% endblock %}

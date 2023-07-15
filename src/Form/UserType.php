@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,7 +18,14 @@ class UserType extends AbstractType
             ->add('Prenom', TextType::class,['label' => 'Prénom'])
             ->add('Age')
             ->add('Cin')
-            ->add('Adresse')
+            ->add('Adresse',TextType::class,['label'=>'Adresse lot'])
+            ->add('Height', NumberType::class,[
+                  'attr'=>[
+                    'step'=>0.01,
+                    'placeholder' =>'entre votre taille',
+                   
+                ]
+            ])
         ;
         ;
         ;

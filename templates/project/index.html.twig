@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
  
-{% block title %}Dtc formation{% endblock %}
+{% block title %}Symfony 5 Project Manager{% endblock %}
 
  
 {% block body %}
 <div class="container">
-        <h2 class="text-center mt-5 mb-3">symfony</h2>
+        <h2 class="text-center mt-5 mb-3">Symfony 5 Project Manager</h2>
         <div class="card">
             <div class="card-header">
                 <button class="btn btn-outline-primary" onclick="createProject()"> 
-                   Ajouter
+                    Create New Project
                 </button>
             </div>
             <div class="card-body">
@@ -19,12 +19,8 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Age</th>
-                            <th>Cin</th>
-                            <th>adresse</th>
-                            <th>height</th>
+                            <th>Name</th>
+                            <th>Description</th>
                             <th width="240px">Action</th>
                         </tr>
                     </thead>
@@ -47,35 +43,18 @@
             </div>
             <div class="modal-body">
                 <div id="error-div"></div>
-                <form method="POST" action="/user/new">
+                <form method="POST" action="/project/new">
                     <input type="hidden" name="update_id" id="update_id">
                     <div class="form-group">
-                        <label for="nom">Nom</label>
-                        <input type="text" class="form-control" id="nom" name="nom">
-                    </div>
-                     <div class="form-group">
-                        <label for="prenom">Prénom</label>
-                        <input type="text" class="form-control" id="prenom" name="prenom">
+                        <label for="name">Nom</label>
+                        <input type="text" class="form-control" id="name" name="name">
                     </div>
                     <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" class="form-control" id="age" name="age">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" rows="3" name="description"></textarea>
                     </div>
-                      <div class="form-group">
-                        <label for="cin">CIN</label>
-                        <input type="number" class="form-control" id="cin" name="cin">
-                    </div>
-                     <div class="form-group">
-                        <label for="adresse">Adresse</label>
-                        <input type="text" class="form-control" id="adresse" name="adresse">
-                    </div>
-                    <div class="form-group">
-                       <label for="height">Height</label>
-                       <input type="text" class="form-control" id="height" name="height">
-                    </div>
-                  
                    
-                    <button type="submit" class="btn btn-outline-primary mt-3" id="save-project-btn">Enregistrer</button>
+                    <button type="submit" class="btn btn-outline-primary mt-3" id="save-project-btn">Save Project</button>
                 </form>
             </div>
             </div>
@@ -88,22 +67,14 @@
         <div class="modal-dialog" >
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Information</h5>
+                <h5 class="modal-title">Project Information</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                 <b>Nom:</b>
-                    <p id="nom-info"></p>
-                 <b>Prénom:</b>
-                    <p id="prenom-info"></p>
-                  <b>age</b>
-                    <p id="age-info"></p>
-                  <b>cin</b>
-                    <p id="cin-info"></p>
-                  <b>adresse</b>
-                    <p id="adresse-info"></p>
-                  <b>height</b>
-                    <p id="height-info"></p>
+                <b>Name:</b>
+                <p id="name-info"></p>
+                <b>Description:</b>
+                <p id="description-info"></p>
             </div>
             </div>
         </div>
@@ -122,7 +93,7 @@
         {
  
             $.ajax({
-                url: "/user/show-all",
+                url: "/project/show-all",
                 method: "GET",
                 success: function(response) {
                     $("#projects-table-body").html("");
@@ -131,24 +102,20 @@
                     {
                         let showBtn =  '<button ' +
                             ' class="btn btn-outline-info" ' +
-                            ' onclick="showProject(' + projects[i].id + ')"><i class="fa fa-eye" style="padding: 5px"></i>' +
+                            ' onclick="showProject(' + projects[i].id + ')">Show' +
                         '</button> ';
                         let editBtn =  '<button ' +
                             ' class="btn btn-outline-success" ' +
-                            ' onclick="editProject(' + projects[i].id + ')"><i class="fa fa-edit" style="padding: 5px"></i>' +
+                            ' onclick="editProject(' + projects[i].id + ')">Edit' +
                         '</button> ';
                         let deleteBtn =  '<button ' +
                             ' class="btn btn-outline-danger" ' +
-                            ' onclick="destroyProject(' + projects[i].id + ')"><i class="fa fa-trash" style="padding: 5px"></i>' +
+                            ' onclick="destroyProject(' + projects[i].id + ')">Delete' +
                         '</button>';
        
                         let projectRow = '<tr>' +
-                            '<td>' + projects[i].nom + '</td>' +
-                            '<td>' + projects[i].prenom + '</td>' +
-                            '<td>' + projects[i].age + '</td>' +
-                            '<td>' + projects[i].cin + '</td>' +
-                            '<td>' + projects[i].adresse + '</td>' +
-                            '<td>' + projects[i].height + '</td>' +
+                            '<td>' + projects[i].name + '</td>' +
+                            '<td>' + projects[i].description + '</td>' +
                             '<td>' + showBtn + editBtn + deleteBtn + '</td>' +
                         '</tr>';
                         $("#projects-table-body").append(projectRow);
@@ -184,12 +151,8 @@
             $("#alert-div").html("");
             $("#error-div").html("");   
             $("#update_id").val("");
-            $("#nom").val("");
-            $("#prenom").val("");
-            $("#age").val("");
-            $("#cin").val("");
-            $("#adresse").val("");
-            $("#height").val("");
+            $("#name").val("");
+            $("#description").val("");
             $("#form-modal").modal('show'); 
         }
        
@@ -200,23 +163,19 @@
         {   
             $("#save-project-btn").prop('disabled', true);
             let data = {
-                nom: $("#name").val(),
+                name: $("#name").val(),
                 description: $("#description").val(),
             };
             $.ajax({
-                url: "/user/new",
+                url: "/project/new",
                 method: "POST",
                 data: data,
                 success: function(response) {
                     $("#save-project-btn").prop('disabled', false);
                     let successHtml = '<div class="alert alert-success" role="alert"><b>Project Created Successfully</b></div>';
                     $("#alert-div").html(successHtml);
-                    $("#nom").val("");
-                    $("#prenom").val("");
-                    $("#age").val("");
-                    $("#cin").val("");
-                    $("#adresse").val("");
-                    $("#height").val("");
+                    $("#name").val("");
+                    $("#description").val("");
                     showAllProjects();
                     $("#form-modal").modal('hide');
                 },
@@ -259,20 +218,15 @@
         {
              
             $.ajax({
-                url: "user/show/" + id,
+                url: "project/show/" + id,
                 method: "GET",
                 success: function(response) {
-                    let user = response
+                    let project = response
                     $("#alert-div").html("");
                     $("#error-div").html("");   
-                    $("#update_id").val(user.id);
-                    $("#nom").val(user.nom);
-                    $("#prenom").val(user.prenom);
-                    $("#age").val(user.age);
-                    $("#cin").val(user.cin);
-                    $("#adresse").val(user.adresse);
-                    $("#height").val(user.height);
-                    
+                    $("#update_id").val(project.id);
+                    $("#name").val(project.name);
+                    $("#description").val(project.description);
                     $("#form-modal").modal('show'); 
                 },
                 error: function(response) {
@@ -288,33 +242,23 @@
         {
             $("#save-project-btn").prop('disabled', true);
             let data = {
-                nom: $("#nom").val(),
-                prenom:$("#prenom").val(),
-                age:$("#age").val(),
-                cin:$("#cin").val(),
-                adresse: $("#adresse").val(),
-                adresse: $("#height").val(),
+                name: $("#name").val(),
+                description: $("#description").val(),
             };
             $.ajax({
-                url: "/user/edit/" + $("#update_id").val(),
+                url: "/project/edit/" + $("#update_id").val(),
                 method: "PUT",
                 data: data,
                 success: function(response) {
                     $("#save-project-btn").prop('disabled', false);
                     let successHtml = '<div class="alert alert-success" role="alert"><b>Project Updated Successfully</b></div>';
                     $("#alert-div").html(successHtml);
-                    $("#nom").val("");
-                    $("#prenom").val("");
-                    $("#age").val("");
-                    $("#cin").val("");
-                    $("#adresse").val("");
-                    $("#height").val("");
-                   
+                    $("#name").val("");
+                    $("#description").val("");
                     showAllProjects();
                     $("#form-modal").modal('hide');
                 },
                 error: function(response) {
-                    
                     /*
                     show validation error
                     */
@@ -323,40 +267,20 @@
                     if (typeof response.responseJSON.messages.errors !== 'undefined') 
                     {
                         let errors = response.responseJSON.messages.errors;
-                        let adresseValidation = "";
-                        if (typeof errors.adresse !== 'undefined') 
+                        let descriptionValidation = "";
+                        if (typeof errors.description !== 'undefined') 
                         {
-                            adresseValidation = '<li>' + errors.adresse + '</li>';
+                            descriptionValidation = '<li>' + errors.description + '</li>';
                         }
-                        let nomValidation = "";
-                        if (typeof errors.nom !== 'undefined') 
+                        let nameValidation = "";
+                        if (typeof errors.name !== 'undefined') 
                         {
-                            nomValidation = '<li>' + errors.nom + '</li>';
-                        }
-                        let prenomValidation = "";
-                        if (typeof errors.prenom !== 'undefined') 
-                        {
-                            prenomValidation = '<li>' + errors.prenom + '</li>';
-                        }
-                        let cinValidation = "";
-                        if (typeof errors.cin !== 'undefined') 
-                        {
-                            cinValidation = '<li>' + errors.cin + '</li>';
-                        }
-                        let ageValidation = "";
-                        if (typeof errors.age !== 'undefined') 
-                        {
-                            ageValidation = '<li>' + errors.age + '</li>';
-                        }
-                        let heightValidation = "";
-                        if (typeof errors.height !== 'undefined') 
-                        {
-                            heightValidation = '<li>' + errors.height + '</li>';
+                            nameValidation = '<li>' + errors.name + '</li>';
                         }
            
                         let errorHtml = '<div class="alert alert-danger" role="alert">' +
                             '<b>Validation Error!</b>' +
-                            '<ul>' + nomValidation + prenomValidation + adresseValidation + heightValidation + cinValidation + ageValidation + '</ul>' +
+                            '<ul>' + nameValidation + descriptionValidation + '</ul>' +
                         '</div>';
                         $("#error-div").html(errorHtml);        
                     }
@@ -369,24 +293,15 @@
         */
         function showProject(id)
         {
-            $("#nom-info").html("");
-            $("#prenom-info").html("");
-            $("#age-info").html("");
-            $("#cin-info").html("");
-            $("#adresse-info").html("");
-            $("#height-info").html("");
+            $("#name-info").html("");
+            $("#description-info").html("");
             $.ajax({
-                url: "user/show/" + id,
+                url: "project/show/" + id,
                 method: "GET",
                 success: function(response) {
-                    let user = response
-                    $("#nom-info").html(user.nom);
-                    $("#prenom-info").html(user.prenom);
-                    $("#age-info").html(user.age);
-                    $("#cin-info").html(user.cin);
-                    $("#adresse-info").html(user.adresse);
-                    $("#height-info").html(user.height);
-               
+                    let project = response
+                    $("#name-info").html(project.name);
+                    $("#description-info").html(project.description);
                     $("#view-modal").modal('show'); 
                 },
                 error: function(response) {
@@ -401,7 +316,7 @@
         function destroyProject(id)
         {
             $.ajax({
-                url: "/user/delete/" + id,
+                url: "/project/delete/" + id,
                 method: "DELETE",
                 success: function(response) {
                     let successHtml = '<div class="alert alert-success" role="alert"><b>Project Deleted Successfully</b></div>';

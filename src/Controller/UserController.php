@@ -1,84 +1,151 @@
 <?php
-
+ 
 namespace App\Controller;
-
-use App\Entity\User;
-use App\Form\UserType;
-use App\Repository\UserRepository;
+ 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-
-#[Route('/user')]
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\User;
+ 
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    /**
+     * @Route("/user", name="user")
+     */
+    public function index(): Response
     {
         return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'controller_name' => 'UserController',
         ]);
     }
-
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, UserRepository $userRepository): Response
+ 
+    /**
+     * @Route("/user/show-all", name="user_show_all", methods={"GET"})
+     */
+    public function showAll(): Response
     {
+        $users = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->findAll();
+ 
+        $data = [];
+ 
+        foreach ($users as $user) {
+           $data[] = [
+               'id' => $user->getId(),
+               'nom' => $user->getNom(),
+               'prenom' =>$user->getPrenom(),
+               'age' =>$user->getAge(),
+               'cin' => $user->getCIN(),
+               'adresse' =>$user->getAdresse(),
+               'height' =>$user->getHeight(),
+           ];
+        }
+ 
+ 
+        return $this->json($data);
+    }
+ 
+    /**
+     * @Route("/user/show/{id}", name="user_show", methods={"GET"})
+     */
+    public function show(int $id): Response
+    {
+        $user = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->find($id);
+ 
+        if (!$user) {
+ 
+            return $this->json('No project found for id' . $id, 404);
+        }
+ 
+        $data =  [
+            'id' => $user->getId(),
+            'nom' => $user->getNom(),
+            'prenom' =>$user->getPrenom(),
+            'age' =>$user->getAge(),
+            'cin' => $user->getCIN(),
+            'adresse' =>$user->getAdresse(),
+            'height' =>$user->getHeight(),
+        ];
+         
+        return $this->json($data);
+    }
+ 
+    /**
+     * @Route("/user/new", name="user_new", methods={"POST"})
+     */
+    public function new(Request $request): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+ 
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-        //var_dump($user);
+        $user->setNom($request->request->get('nom'));
+        $user->setPrenom($request->request->get('prenom'));
+        $user->setAge($request->request->get('age'));
+        $user->setCIN($request->request->get('cin'));
+        $user->setAdresse($request->request->get('adresse'));
+        $user->setHeight($request->request->get('height'));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($user, true);
-            
-            if ($request->isXmlHttpRequest()) {
-                return new JsonResponse(['success' => true]);
-            }
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('user/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        
+        $entityManager->persist($user);
+        $entityManager->flush();
+ 
+        return $this->redirectToRoute('user');
     }
-
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+ 
+    /**
+     * @Route("/user/edit/{id}", name="user_edit", methods={"PUT"})
+     */
+    public function edit(Request $request, int $id): Response
     {
-        return $this->render('user/show.html.twig', [
-            'user' => $user,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, UserRepository $userRepository): Response
-    {
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->save($user, true);
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $entityManager->getRepository(User::class)->find($id);
+ 
+        if (!$user) {
+            return $this->json('No project found for id' . $id, 404);
         }
-
-        return $this->renderForm('user/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+ 
+        $user->setNom($request->request->get('nom'));
+        $user->setPrenom($request->request->get('prenom'));
+        $user->setAge($request->request->get('age'));
+        $user->setCIN($request->request->get('cin'));
+        $user->setAdresse($request->request->get('adresse'));
+        $user->setHeight($request->request->get('height'));
+        $entityManager->flush();
+ 
+        $data =  [
+            'id' => $user->getId(),
+            'nom' => $user->getNom(),
+            'prenom' =>$user->getPrenom(),
+            'age' =>$user->getAge(),
+            'cin' => $user->getCIN(),
+            'adresse' =>$user->getAdresse(),
+            'heigth' =>$user->getHeigth(),
+        ];
+         
+        return $this->json($data);
     }
-
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, UserRepository $userRepository): Response
+ 
+    /**
+     * @Route("/user/delete/{id}", name="user_delete", methods={"DELETE"})
+     */
+    public function delete(int $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $userRepository->remove($user, true);
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $entityManager->getRepository(User::class)->find($id);
+ 
+        if (!$user) {
+            return $this->json('No project found for id' . $id, 404);
         }
-
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+ 
+        $entityManager->remove($user);
+        $entityManager->flush();
+ 
+        return $this->json('Deleted a project successfully with id ' . $id);
     }
+ 
+ 
 }

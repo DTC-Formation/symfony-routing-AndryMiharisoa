@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
+
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource]
 class User
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue]//autocrimente
     #[ORM\Column]
     private ?int $id = null;
 
@@ -31,6 +34,9 @@ class User
     
     #[ORM\Column]
     private ?float $Height ;
+
+    #[ORM\ManyToOne(inversedBy: 'user')]
+    private ?Etude $etude = null;
 
     public function getId(): ?int
     {
@@ -105,6 +111,18 @@ class User
           $this->Height=$Height;
 
           return $this;
+    }
+
+    public function getEtude(): ?Etude
+    {
+        return $this->etude;
+    }
+
+    public function setEtude(?Etude $etude): self
+    {
+        $this->etude = $etude;
+
+        return $this;
     }
     
 
